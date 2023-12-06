@@ -35,20 +35,21 @@ export class UserService {
   }
 
   async updateUser(userData: UserDto) {
-    const { firstName, lastName, email } = userData;
+    const { firstName, lastName, email, image } = userData;
     const user = this.prisma.user.upsert({
       where: {
         email,
       },
       update: {
-        firstName,
-        lastName,
+        firstName: firstName || undefined,
+        lastName: lastName || undefined,
+        image: image || undefined,
       },
       create: {
         email,
         firstName,
         lastName,
-        image: '',
+        image,
         pdf: Buffer.from([]),
       },
     });

@@ -40,8 +40,13 @@ export class UserController {
   }
 
   @Patch('update')
-  async updateUser(@Body() userData: UserDto) {
-    return await this.userService.updateUser(userData);
+  @UseInterceptors(FileInterceptor(FORM_FIELD_NAME, STORAGE_SETTINGS))
+  async updateUser(
+    @Body() userData: UserDto,
+    @UploadedFile() file: UploadFileType,
+  ) {
+    const image = file && file.filename;
+    return await this.userService.updateUser({ ...userData, image });
   }
 
   @Delete('delete')
