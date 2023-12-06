@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserDto } from './dto/User.dto';
+import * as PDFDocument from 'pdfkit';
+import { DESTINATION_FILE } from './constants/uploadFile';
 
 @Injectable()
 export class UserService {
@@ -62,5 +64,48 @@ export class UserService {
         email,
       },
     });
+  }
+
+  async createPdf(email: string) {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    const { firstName, lastName, image } = user;
+
+    const pdfBuffer: Buffer = await new Promise((resolve) => {
+      const doc = new PDFDocument({
+        size: 'LETTER',
+        bufferPages: true,
+      });
+
+      //todo
+      doc.text(`FirstName: ${firstName}`);
+      doc.moveDown();
+      doc.text(`LastName: ${lastName}`);
+
+      doc.image(`${DESTINATION_FILE}/${image}`);
+
+      const buffer = [];
+      doc.on('data', buffer.push.bind(buffer));
+      doc.on('end', () => {
+        const data = Buffer.concat(buffer);
+        resolve(data);
+      });
+      doc.end();
+    });
+
+    await this.addPdfToDatabase({ email, pdf: pdfBuffer });
+
+    return pdfBuffer;
+  }
+
+  async addPdfToDatabase({ email, pdf }: { email: string; pdf: Buffer }) {
+    const isAddedPdf = await this.prisma.user.update({
+      where: {
+        email,
+      },
+      data: {
+        pdf,
+      },
+    });
+    return isAddedPdf;
   }
 }

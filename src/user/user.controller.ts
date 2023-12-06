@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Res,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -14,6 +15,7 @@ import { UserDto } from './dto/User.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FORM_FIELD_NAME, STORAGE_SETTINGS } from './constants/uploadFile';
 import { UploadFileType } from './types/types';
+import { Response } from 'express';
 
 @Controller('user')
 export class UserController {
@@ -52,5 +54,16 @@ export class UserController {
   @Delete('delete')
   async deleteUser(@Body() { email }: { email: string }) {
     return await this.userService.deleteUser(email);
+  }
+
+  @Post('create-pdf')
+  async createPdf(@Body() { email }: { email: string }, @Res() res: Response) {
+    const buffer = await this.userService.createPdf(email);
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment; filename=example.pdf',
+      'Content-Length': buffer.length,
+    });
+    res.end(buffer);
   }
 }
