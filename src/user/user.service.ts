@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserDto } from './dto/User.dto';
-import * as PDFDocument from 'pdfkit';
-import { DESTINATION_FILE } from './constants/uploadFile';
+import { createPdfBuffer } from './utils/createPdfBuffer';
+import { EMPTY_LENGTH } from './constants/uploadFile';
 
 @Injectable()
 export class UserService {
@@ -68,37 +68,21 @@ export class UserService {
 
   async createPdf(email: string) {
     const user = await this.prisma.user.findUnique({ where: { email } });
-    const { firstName, lastName, image } = user;
+    if (!user) {
+      return false;
+    }
 
-    const pdfBuffer: Buffer = await new Promise((resolve) => {
-      const doc = new PDFDocument({
-        size: 'LETTER',
-        bufferPages: true,
-      });
+    const pdfBuffer: Buffer = await createPdfBuffer(user);
 
-      //todo
-      doc.text(`FirstName: ${firstName}`);
-      doc.moveDown();
-      doc.text(`LastName: ${lastName}`);
+    const userData = await this.addPdfToDatabase({ email, pdf: pdfBuffer });
 
-      doc.image(`${DESTINATION_FILE}/${image}`);
+    const isPdfAdded = userData.pdf.length > EMPTY_LENGTH;
 
-      const buffer = [];
-      doc.on('data', buffer.push.bind(buffer));
-      doc.on('end', () => {
-        const data = Buffer.concat(buffer);
-        resolve(data);
-      });
-      doc.end();
-    });
-
-    await this.addPdfToDatabase({ email, pdf: pdfBuffer });
-
-    return pdfBuffer;
+    return isPdfAdded;
   }
 
   async addPdfToDatabase({ email, pdf }: { email: string; pdf: Buffer }) {
-    const isAddedPdf = await this.prisma.user.update({
+    const userData = await this.prisma.user.update({
       where: {
         email,
       },
@@ -106,6 +90,15 @@ export class UserService {
         pdf,
       },
     });
-    return isAddedPdf;
+    return userData;
+  }
+
+  async getPdfFromDatabase(email: string) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
+    return user.pdf;
   }
 }

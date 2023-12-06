@@ -16,10 +16,18 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { FORM_FIELD_NAME, STORAGE_SETTINGS } from './constants/uploadFile';
 import { UploadFileType } from './types/types';
 import { Response } from 'express';
+import { setHeadersForPdf } from './utils/setHeadersForPdf';
 
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
+
+  @Get('pdf')
+  async getPdf(@Body() { email }: { email: string }, @Res() res: Response) {
+    const buffer = await this.userService.getPdfFromDatabase(email);
+    res.set(setHeadersForPdf(buffer.length));
+    res.end(buffer);
+  }
 
   @Get('all')
   async getAllUsers() {
@@ -57,13 +65,8 @@ export class UserController {
   }
 
   @Post('create-pdf')
-  async createPdf(@Body() { email }: { email: string }, @Res() res: Response) {
-    const buffer = await this.userService.createPdf(email);
-    res.set({
-      'Content-Type': 'application/pdf',
-      'Content-Disposition': 'attachment; filename=example.pdf',
-      'Content-Length': buffer.length,
-    });
-    res.end(buffer);
+  async createPdf(@Body() { email }: { email: string }) {
+    const isPdfAdded = await this.userService.createPdf(email);
+    return isPdfAdded;
   }
 }
