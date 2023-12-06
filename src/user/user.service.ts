@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/User.dto';
 import { createPdfBuffer } from './utils/createPdfBuffer';
@@ -59,6 +59,10 @@ export class UserService {
   }
 
   async deleteUser(email: string) {
+    const user = await this.getUserByEmail(email);
+    if (!user) {
+      throw new BadRequestException('Incorrect data!');
+    }
     return await this.prisma.user.delete({
       where: {
         email,
@@ -99,6 +103,9 @@ export class UserService {
         email,
       },
     });
+    if (!user) {
+      throw new BadRequestException('Cant get pdf!');
+    }
     return user.pdf;
   }
 }

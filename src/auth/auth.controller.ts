@@ -13,13 +13,14 @@ import {
   STORAGE_SETTINGS,
 } from 'src/user/constants/uploadFile';
 import { UploadFileType } from 'src/user/types/types';
+import { LoginUserDto } from './dto/LoginUser.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('signin')
-  async signIn(@Body() { email }: { email: string }) {
+  async signIn(@Body() { email }: LoginUserDto) {
     return this.authService.signIn(email);
   }
 

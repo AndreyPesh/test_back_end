@@ -10,10 +10,10 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
   providers: [
     UserService,
     PrismaService,
-    {
-      provide: APP_GUARD,
-      useClass: JwtAuthGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: JwtAuthGuard,
+    // },
   ],
   exports: [UserService],
 })
