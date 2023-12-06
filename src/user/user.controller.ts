@@ -12,9 +12,8 @@ import {
 import { UserService } from './user.service';
 import { UserDto } from './dto/User.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { createFileName } from './utils/createFileName';
-import { DESTINATION_FILE, FORM_FIELD_NAME } from './constants/uploadFile';
+import { FORM_FIELD_NAME, STORAGE_SETTINGS } from './constants/uploadFile';
+import { UploadFileType } from './types/types';
 
 @Controller('user')
 export class UserController {
@@ -31,17 +30,10 @@ export class UserController {
   }
 
   @Post('create')
-  @UseInterceptors(
-    FileInterceptor(FORM_FIELD_NAME, {
-      storage: diskStorage({
-        destination: DESTINATION_FILE,
-        filename: createFileName,
-      }),
-    }),
-  )
+  @UseInterceptors(FileInterceptor(FORM_FIELD_NAME, STORAGE_SETTINGS))
   async createUser(
     @Body() userData: UserDto,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file: UploadFileType,
   ) {
     const image = file && file.filename;
     return await this.userService.createUser({ ...userData, image });
