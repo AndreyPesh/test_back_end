@@ -11,7 +11,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { UserDto } from './dto/User.dto';
+import { CreateUserDto } from './dto/User.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FORM_FIELD_NAME, STORAGE_SETTINGS } from './constants/uploadFile';
 import { UploadFileType } from './types/types';
@@ -42,7 +42,7 @@ export class UserController {
   @Post('create')
   @UseInterceptors(FileInterceptor(FORM_FIELD_NAME, STORAGE_SETTINGS))
   async createUser(
-    @Body() userData: UserDto,
+    @Body() userData: CreateUserDto,
     @UploadedFile() file: UploadFileType,
   ) {
     const image = file && file.filename;
@@ -52,7 +52,7 @@ export class UserController {
   @Patch('update')
   @UseInterceptors(FileInterceptor(FORM_FIELD_NAME, STORAGE_SETTINGS))
   async updateUser(
-    @Body() userData: UserDto,
+    @Body() userData: CreateUserDto,
     @UploadedFile() file: UploadFileType,
   ) {
     const image = file && file.filename;

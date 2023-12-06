@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { UserDto } from './dto/User.dto';
+import { CreateUserDto } from './dto/User.dto';
 import { createPdfBuffer } from './utils/createPdfBuffer';
 import { EMPTY_LENGTH } from './constants/uploadFile';
 
@@ -13,7 +13,7 @@ export class UserService {
     return users;
   }
 
-  async createUser(user: UserDto) {
+  async createUser(user: CreateUserDto) {
     const { firstName, lastName, email, image } = user;
     const newUser = await this.prisma.user.create({
       data: {
@@ -36,7 +36,7 @@ export class UserService {
     return user;
   }
 
-  async updateUser(userData: UserDto) {
+  async updateUser(userData: CreateUserDto) {
     const { firstName, lastName, email, image } = userData;
     const user = this.prisma.user.upsert({
       where: {
