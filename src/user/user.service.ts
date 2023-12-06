@@ -12,13 +12,13 @@ export class UserService {
   }
 
   async createUser(user: UserDto) {
-    const { firstName, lastName, email } = user;
+    const { firstName, lastName, email, image } = user;
     const newUser = await this.prisma.user.create({
       data: {
         firstName,
         lastName,
         email,
-        image: '',
+        image,
         pdf: Buffer.from([]),
       },
     });

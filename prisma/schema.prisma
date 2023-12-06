@@ -12,7 +12,7 @@ model User {
   firstName String @map("first_name")
   lastName  String @map("last_name")
   email     String @unique
-  image     String
+  image     String @default("")
   pdf       Bytes
 
   @@map("user")

@@ -6,9 +6,15 @@ import {
   Param,
   Patch,
   Post,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDto } from './dto/User.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { createFileName } from './utils/createFileName';
+import { DESTINATION_FILE, FORM_FIELD_NAME } from './constants/uploadFile';
 
 @Controller('user')
 export class UserController {
@@ -25,8 +31,20 @@ export class UserController {
   }
 
   @Post('create')
-  async createUser(@Body() userData: UserDto) {
-    return await this.userService.createUser(userData);
+  @UseInterceptors(
+    FileInterceptor(FORM_FIELD_NAME, {
+      storage: diskStorage({
+        destination: DESTINATION_FILE,
+        filename: createFileName,
+      }),
+    }),
+  )
+  async createUser(
+    @Body() userData: UserDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const image = file && file.filename;
+    return await this.userService.createUser({ ...userData, image });
   }
 
   @Patch('update')
