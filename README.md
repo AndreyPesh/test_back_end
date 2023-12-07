@@ -29,9 +29,7 @@
 ## Installation
 
 ```bash
-$ yarn install
-
-# run docker
+# run app
 $ yarn docker
 ```
 
@@ -50,11 +48,99 @@ $ yarn run start:prod
 
 ## Endpoints
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+_Sign up_
 
-## Stay in touch
+```bash
+POST http://localhost:3000/api/auth/signup
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+form-data:
 
+  firstName
+  lastName
+  email
+  file
+
+Response:
+{"access_token": ""}
+```
+
+_Sign in_
+
+```bash
+POST http://localhost:3000/api/auth/signin
+
+body:
+  {"email": ""}
+
+Response:
+{"access_token": ""}
+```
+
+_Create user_ (Protected route. Auth with Bearer token `access_token`)
+
+```bash
+POST http://localhost:3000/api/user/create
+
+  form-data:
+
+  firstName
+  lastName
+  email
+  file
+```
+
+_Read user_
+
+```bash
+GET http://localhost:3000/api/user/{email}
+```
+
+_Update user_ (Protected route. Auth with Bearer token `access_token`)
+
+```bash
+PATCH http://localhost:3000/api/user/update
+
+  form-data:
+  
+  firstName
+  lastName
+  email
+  file
+```
+
+_Delete user_ (Protected route. Auth with Bearer token `access_token`)
+
+```bash
+DELETE http://localhost:3000/api/user/delete
+
+  body:
+  {"email": ""}
+```
+
+_Create pdf_ (Protected route. Auth with Bearer token `access_token`)
+
+```bash
+POST http://localhost:3000/api/user/create-pdf
+
+  body:
+  {"email": ""}
+
+  Response: true/false
+```
+
+_Get pdf_ (Protected route. Auth with Bearer token `access_token`)
+
+```bash
+GET http://localhost:3000/api/user/pdf
+
+  body:
+  {"email": ""}
+
+  Response: application/pdf
+```
+
+_Get user list_
+
+```bash
+GET http://localhost:3000/api/user/all
+```
