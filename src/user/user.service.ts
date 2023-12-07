@@ -14,6 +14,11 @@ export class UserService {
   }
 
   async createUser(user: CreateUserDto) {
+    const isUserExist = await this.getUserByEmail(user.email);
+    if (isUserExist) {
+      throw new BadRequestException('User already exist!');
+    }
+
     const { firstName, lastName, email, image } = user;
     const newUser = await this.prisma.user.create({
       data: {
@@ -43,9 +48,9 @@ export class UserService {
         email,
       },
       update: {
-        firstName: firstName || undefined,
-        lastName: lastName || undefined,
-        image: image || undefined,
+        firstName: firstName,
+        lastName: lastName,
+        image: image,
       },
       create: {
         email,
