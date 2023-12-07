@@ -76,6 +76,10 @@ export class UserService {
       return false;
     }
 
+    if (!user.image) {
+      throw new BadRequestException('Load image. Image is not exist!');
+    }
+
     const pdfBuffer: Buffer = await createPdfBuffer(user);
 
     const userData = await this.addPdfToDatabase({ email, pdf: pdfBuffer });
